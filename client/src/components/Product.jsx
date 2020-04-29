@@ -1,5 +1,9 @@
 import React, { Component, Fragment } from 'react'
 import { List, Avatar, Skeleton, Button, Modal, Form, Input, notification } from 'antd'
+import {
+  DeleteOutlined,
+  EyeOutlined,
+} from '@ant-design/icons'
 import api from '../api'
 
 class ProductList extends Component {
@@ -35,10 +39,14 @@ class ProductList extends Component {
     });
     await api.insertProduct(values).then(res => {
       this.openNotification('success', 'Product', 'Product inserted successfully')
+      this.getData()
       this.setState({
         confirmLoading: false,
         modalVisible: false
       })
+    })
+    .catch(error => {
+      this.openNotification('error', 'Product', error.message.name)
     })
   }
 
@@ -104,7 +112,10 @@ class ProductList extends Component {
           dataSource={data}
           renderItem={item => (
             <List.Item
-              actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
+              actions={[
+                <a key="list-loadmore-show"><EyeOutlined /> See detail</a>, 
+                <a key="list-loadmore-more"><DeleteOutlined style={{color: 'red'}} /></a>
+              ]}
             >
               <Skeleton avatar title={false} loading={item.loading} active>
                 <List.Item.Meta

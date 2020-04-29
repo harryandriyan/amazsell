@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Row, Col } from 'antd'
-import { Product } from '../components'
+import { Product, Insight } from '../components'
 
 
 class Dashboard extends Component {
@@ -22,7 +22,7 @@ class Dashboard extends Component {
           </Col>
           <Col span={1} />
           <Col span={12}>
-            <h2>Insight</h2>
+            <Insight />
           </Col>
         </Row>
       </>
