@@ -17,7 +17,7 @@ createProduct = (req, res) => {
       .then(data => {
         resolve(data)
       })
-      .catch(err => reject('Product scrape failed'))
+      .catch(err => reject(err))
   })
 
   Promise.all([productInfo])
