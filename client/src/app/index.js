@@ -6,7 +6,7 @@ import {
   HomeOutlined,
   SmileOutlined,
 } from '@ant-design/icons';
-import { Dashboard, About } from '../pages'
+import { Dashboard, About, Review } from '../pages'
 import 'antd/dist/antd.css'
 
 const { Header, Footer, Content } = Layout
@@ -38,6 +38,7 @@ function App() {
             <Switch>
               <Route path="/" exact component={Dashboard} />
               <Route path="/about" exact component={About} />
+              <Route path="/product/:asin" exact component={Review} />
             </Switch>
           </div>
         </Content>

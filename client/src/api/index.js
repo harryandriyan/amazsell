@@ -6,28 +6,38 @@ const api = axios.create({
 
 export const insertProduct = payload => api.post(`/product`, payload)
 export const getAllProduct = () => api.get(`/product`)
-export const updateProductById = (id, payload) => api.put(`/product/${id}`, payload)
 export const deleteProductById = id => api.delete(`/product/${id}`)
 export const getProductById = id => api.get(`/product/${id}`)
 
-export const insertReview = payload => api.post(`/review`, payload)
-export const getAllReview = () => api.get(`/review`)
-export const updateReviewById = (id, payload) => api.put(`/review/${id}`, payload)
+export const generateReview = asin => api.post(`/review/${asin}`)
+export const updateReview = payload => api.put(`/review`, payload)
 export const deleteReviewById = id => api.delete(`/review/${id}`)
-export const getReviewById = id => api.get(`/review/${id}`)
+export const getAllReview = () => api.get(`/review`)
+export const getReviewByASIN = asin => api.get(`/review-by-asin/${asin}`)
+export const getReviewCountByASIN = asin => api.get(`/review-count-by-asin/${asin}`)
+
+export const insertTag = payload => api.post(`/tag`, payload)
+export const deleteTagsById = id => api.delete(`/tag/${id}`)
+export const getAllTags = () => api.get(`/tags`)
+export const getTagsByASIN = asin => api.get(`/tags-by-asin/${asin}`)
 
 const apis = {
   insertProduct,
   getAllProduct,
-  updateProductById,
   deleteProductById,
   getProductById,
 
-  insertReview,
-  getAllReview,
-  updateReviewById,
+  generateReview,
+  updateReview,
   deleteReviewById,
-  getReviewById,
+  getAllReview,
+  getReviewByASIN,
+  getReviewCountByASIN,
+  
+  insertTag,
+  deleteTagsById,
+  getAllTags,
+  getTagsByASIN,
 }
 
 export default apis

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import { Link } from 'react-router-dom'
 import { List, Avatar, Skeleton, Button, Modal, Form, Input, notification } from 'antd'
 import {
   DeleteOutlined,
@@ -113,7 +114,7 @@ class ProductList extends Component {
           renderItem={item => (
             <List.Item
               actions={[
-                <a key="list-loadmore-show"><EyeOutlined /> See detail</a>, 
+                <Link to={`/product/${item.asin}`} key="list-loadmore-show"><EyeOutlined /> See detail</Link>, 
                 <a key="list-loadmore-more"><DeleteOutlined style={{color: 'red'}} /></a>
               ]}
             >
@@ -122,7 +123,7 @@ class ProductList extends Component {
                   avatar={
                     <Avatar src="https://images-na.ssl-images-amazon.com/images/G/01/rainier/available_at_amazon_1200x600_Nvz5h2M.png" />
                   }
-                  title={<a href="https://ant.design">{item.asin}</a>}
+                  title={<Link to={`/product/${item.asin}`}>{item.asin}</Link>}
                   description={`${item.name} \n ${item.price} \n Rating: ${item.rating}`}
                 />
               </Skeleton>
