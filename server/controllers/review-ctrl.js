@@ -1,36 +1,64 @@
 const Review = require('../models/review-model')
+const ReviewScrapper = require('../scrapper/review')
 
 createReview = (req, res) => {
-  const body = req.body
+  const { asin } = req.params
 
-  if (!body) {
-    return res.status(400).json({
-      success: false,
-      error: 'You must provide a review',
-    })
-  }
-
-  const review = new Review(body)
-
-  if (!review) {
-    return res.status(400).json({ success: false, error: err })
-  }
-
-  review
-    .save()
-    .then(() => {
-      return res.status(201).json({
-        success: true,
-        id: review._id,
-        message: 'Review created!',
+  const reviewData = new Promise((resolve, reject) => {
+    ReviewScrapper
+      .scrapeReview(asin)
+      .then(data => {
+        resolve(data)
       })
-    })
-    .catch(error => {
-      return res.status(400).json({
-        error,
-        message: 'Review not created!',
+      .catch(err => reject(err))
+  })
+
+  Promise.all([reviewData])
+    .then(data => {
+      const reviewData = data[0];
+
+      reviewData.map(data => {
+        const review = new Review(data)
+
+        if (!review) {
+          return res.status(400).json({ success: false, error: err })
+        }
+
+        review
+          .save()
+          .then(() => {
+            return res.status(201).json({
+            success: true,
+            id: review._id,
+            message: 'Review created!',
+          })
+        })
+        .catch(error => {
+          return res.status(400).json({
+            error,
+            message: 'Review not created!',
+          })
+        })
       })
+      
     })
+    .catch(err => res.status(500).send(err))
+}
+
+updateReview = async(req, res) => {
+  await Review.findOneAndUpdate({ _id: req.body.id }, {$set: {tags: req.body.tags}}, (err, review) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err })
+    }
+
+    if (!review) {
+      return res
+        .status(404)
+        .json({ success: false, error: `Review not found` })
+    }
+
+    return res.status(200).json({ success: true, data: review })
+  }).catch(err => console.log(err))
 }
 
 deleteReview = async (req, res) => {
@@ -50,12 +78,22 @@ deleteReview = async (req, res) => {
 }
 
 getReviewByASIN = async (req, res) => {
-  await Review.findOne({ _id: req.params.asin }, (err, review) => {
+  await Review.find({ asin: req.params.asin }, (err, review) => {
     if (err) {
       return res.status(400).json({ success: false, error: err })
     }
 
     return res.status(200).json({ success: true, data: review })
+  }).catch(err => console.log(err))
+}
+
+getReviewCountByASIN = async (req, res) => {
+  await Review.count({ asin: req.params.asin }, (err, review) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err })
+    }
+
+    return res.status(200).json({ success: true, count: review })
   }).catch(err => console.log(err))
 }
 
@@ -75,7 +113,9 @@ getReviews = async (req, res) => {
 
 module.exports = {
   createReview,
+  updateReview,
   deleteReview,
   getReviewByASIN,
+  getReviewCountByASIN,
   getReviews,
 }

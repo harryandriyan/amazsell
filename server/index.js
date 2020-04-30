@@ -5,6 +5,7 @@ const cors = require('cors')
 const db = require('./db')
 const productRouter = require('./routes/product-router')
 const reviewRouter = require('./routes/review-router')
+const tagRouter = require('./routes/tag-router')
 
 const app = express()
 const apiPort = 3000
@@ -21,5 +22,6 @@ app.get('/', (req, res) => {
 
 app.use('/api', productRouter)
 app.use('/api', reviewRouter)
+app.use('/api', tagRouter)
 
 app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`))
