@@ -78,17 +78,33 @@ deleteReview = async (req, res) => {
 }
 
 getReviewByASIN = async (req, res) => {
-  await Review.find({ asin: req.params.asin }, (err, review) => {
-    if (err) {
-      return res.status(400).json({ success: false, error: err })
-    }
+  const page  = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+  const asin  = req.query.asin
 
-    return res.status(200).json({ success: true, data: review })
-  }).catch(err => console.log(err))
+  try {
+
+    const data = await Review.find({ asin })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+      // get total documents in the Posts collection 
+      const count = await Review.countDocuments()
+
+      // return response with posts, total pages, and current page
+      res.status(200).json({
+        data,
+        totalPages: Math.ceil(count / limit),
+        page
+      })
+    } catch (err) {
+      console.error(err.message)
+    }
 }
 
 getReviewCountByASIN = async (req, res) => {
-  await Review.count({ asin: req.params.asin }, (err, review) => {
+  await Review.countDocuments({ asin: req.params.asin }, (err, review) => {
     if (err) {
       return res.status(400).json({ success: false, error: err })
     }

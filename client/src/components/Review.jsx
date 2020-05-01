@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { List, Rate, Skeleton, Select, notification } from 'antd'
+import { List, Rate, Skeleton, Select, Button, notification } from 'antd'
 import api from '../api'
 
 const { Option } = Select
@@ -8,25 +8,46 @@ class Review extends Component {
   state = {
     data: [],
     loading: false,
-    tagOption: []
+    tagOption: [],
+    currentPage: 1,
+    limit: 5
   }
   
   componentDidMount() {
-    this.getTags();
-    this.getData()
+    const { currentPage } = this.state
+    this.getTags()
+    this.getData(currentPage)
   }
 
-  getData = async() => {
-    const { match: { params } } = this.props
+  getData = async (page) => {
+    const { match: { params: { asin } } } = this.props
     this.setState({ loading: true })
-
-    await api.getReviewByASIN(params.asin).then(reviews => {
-      this.setState({
-        data: reviews.data.data,
-        loading: false,
-      })
+    const params = {
+      page,
+      asin,
+      limit: this.state.limit
+    }
+    await api.getReviewByASIN(params).then(reviews => {
+      if (reviews.data.data.length > 0) {
+        const data = this.state.data.concat(reviews.data.data);
+        this.setState({
+          data,
+          loading: false,
+          currentPage: reviews.data.page,
+          totalPages: reviews.data.totalPages
+        })
+        window.dispatchEvent(new Event('resize'))
+      }
     })
   }
+
+  onLoadMore = () => {
+    const { currentPage, totalPages } = this.state
+    const nextPage = currentPage + 1
+    if (nextPage <= totalPages) {
+      this.getData(nextPage)
+    }
+  };
 
   getTags = async() => {
     await api.getAllTags().then(tags => {
@@ -60,7 +81,21 @@ class Review extends Component {
   };
 
   render() {
-    const { data, loading, tagOption } = this.state
+    const { data, loading, tagOption, currentPage, totalPages } = this.state
+    const nextPage = currentPage + 1
+    const loadMore =
+      (!loading && nextPage <= totalPages) ? (
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: 12,
+            height: 32,
+            lineHeight: '32px',
+          }}
+        >
+          <Button onClick={this.onLoadMore}>load more reviews</Button>
+        </div>
+      ) : null
     return (
       <Fragment>
         <List
@@ -69,6 +104,7 @@ class Review extends Component {
           size="large"
           loading={loading}
           dataSource={data}
+          loadMore={loadMore}
           renderItem={item => (
             <List.Item
               key={item._id}
@@ -86,7 +122,7 @@ class Review extends Component {
               actions={[
                 <Select
                   mode="multiple"
-                  style={{ width: '550px' }}
+                  style={{ width: '450px' }}
                   placeholder="Add tags"
                   defaultValue={item.tags}
                   onChange={(value) => this.handleChangeTag(value, item._id)}

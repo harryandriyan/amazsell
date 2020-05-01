@@ -1,6 +1,9 @@
 import React, { Component, Fragment } from 'react'
 import { Row, Col, Button, Progress } from 'antd'
-import { Review as ReviewComponent } from '../components'
+import { 
+  Review as ReviewComponent, 
+  Summary as SummaryComponent 
+} from '../components'
 import api from '../api'
 
 
@@ -85,13 +88,14 @@ class Review extends Component {
       <Fragment>
         {isHasReview ? (
           <Row>
-            <Col span={15}>
+            <Col span={14}>
               <h1>Review </h1>
               <ReviewComponent {...this.props} />
             </Col>
             <Col span={1} />
-            <Col span={8}>
+            <Col span={9}>
               <h1>Summary </h1>
+              <SummaryComponent {...this.props} />
             </Col>
           </Row>
         ) : this.generateReviewSection()}

@@ -13,7 +13,10 @@ export const generateReview = asin => api.post(`/review/${asin}`)
 export const updateReview = payload => api.put(`/review`, payload)
 export const deleteReviewById = id => api.delete(`/review/${id}`)
 export const getAllReview = () => api.get(`/review`)
-export const getReviewByASIN = asin => api.get(`/review-by-asin/${asin}`)
+export const getReviewByASIN = (payload) => {
+  const uri = `/review-by-asin?asin=${payload.asin}&page=${payload.page}&limit=${payload.limit}`
+  return api.get(uri)
+}
 export const getReviewCountByASIN = asin => api.get(`/review-count-by-asin/${asin}`)
 
 export const insertTag = payload => api.post(`/tag`, payload)
