@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import { List, Avatar, Skeleton, Button, Modal, Form, Input, notification } from 'antd'
+import { List, Avatar, Skeleton, Button, Modal, Form, Input, Popconfirm, notification } from 'antd'
 import {
   DeleteOutlined,
   EyeOutlined,
@@ -11,21 +11,43 @@ class ProductList extends Component {
   state = {
     loading: false,
     data: [],
-    modalVisible: false
+    modalVisible: false,
+    currentPage: 1,
+    limit: 5
   }
 
   componentDidMount() {
-    this.getData()
+    const { currentPage } = this.state
+    this.getData(currentPage)
   }
 
-  getData = async() => {
-    await api.getAllProduct().then(product => {
-      this.setState({
-        data: product.data.data,
-        loading: false,
-      })
+  getData = async (page) => {
+    this.setState({ loading: true })
+    const params = {
+      page,
+      limit: this.state.limit
+    }
+    await api.getAllProduct(params).then(product => {
+      if (product.data.data.length > 0) {
+        const data = this.state.data.concat(product.data.data);
+        this.setState({
+          data,
+          loading: false,
+          currentPage: product.data.page,
+          totalPages: product.data.totalPages
+        })
+        window.dispatchEvent(new Event('resize'))
+      }
     })
   }
+
+  onLoadMore = () => {
+    const { currentPage, totalPages } = this.state
+    const nextPage = currentPage + 1
+    if (nextPage <= totalPages) {
+      this.getData(nextPage)
+    }
+  };
 
   toggleModal = () => {
     this.setState(prevState => ({
@@ -51,6 +73,20 @@ class ProductList extends Component {
     })
   }
 
+  handleDelete = async (id) => {
+    await api.deleteProductById(id).then(res => {
+      this.openNotification('success', 'Product', 'Product deleted successfully')
+      this.getData(this.state.currentPage)
+    })
+    .catch(error => {
+      this.openNotification('error', 'Product', error.message.name)
+    })
+  }
+  
+  cancelDelete = () => {
+    this.openNotification('info', 'Product', 'Delete Product canceled')
+  }
+
   openNotification = (type, message, description) => {
     notification[type]({
       message,
@@ -63,8 +99,26 @@ class ProductList extends Component {
       loading, 
       data,
       modalVisible,
-      confirmLoading
+      confirmLoading,
+      totalPages,
+      currentPage
     } = this.state
+
+    const nextPage = currentPage + 1
+
+    const loadMore =
+      (!loading && nextPage <= totalPages) ? (
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: 12,
+            height: 32,
+            lineHeight: '32px',
+          }}
+        >
+          <Button onClick={this.onLoadMore}>load more products</Button>
+        </div>
+      ) : null
 
     return (
       <Fragment>
@@ -111,17 +165,28 @@ class ProductList extends Component {
           loading={loading}
           itemLayout="horizontal"
           dataSource={data}
+          loadMore={loadMore}
           renderItem={item => (
             <List.Item
               actions={[
                 <Link to={`/product/${item.asin}`} key="list-loadmore-show"><EyeOutlined /> See detail</Link>, 
-                <a key="list-loadmore-more"><DeleteOutlined style={{color: 'red'}} /></a>
+                <Popconfirm
+                  title="Are you sure delete this product?"
+                  onConfirm={() => this.handleDelete(item._id)}
+                  onCancel={this.cancelDelete}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <a key="list-loadmore-more"><DeleteOutlined style={{color: 'red'}} /></a>
+                </Popconfirm>
               ]}
             >
               <Skeleton avatar title={false} loading={item.loading} active>
                 <List.Item.Meta
                   avatar={
-                    <Avatar src="https://images-na.ssl-images-amazon.com/images/G/01/rainier/available_at_amazon_1200x600_Nvz5h2M.png" />
+                    <Link to={`/product/${item.asin}`}>
+                      <Avatar src="https://images-na.ssl-images-amazon.com/images/G/01/rainier/available_at_amazon_1200x600_Nvz5h2M.png" />
+                    </Link>
                   }
                   title={<Link to={`/product/${item.asin}`}>{item.asin}</Link>}
                   description={`${item.name} \n ${item.price} \n Rating: ${item.rating}`}

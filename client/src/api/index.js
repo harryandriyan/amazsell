@@ -5,7 +5,10 @@ const api = axios.create({
 })
 
 export const insertProduct = payload => api.post(`/product`, payload)
-export const getAllProduct = () => api.get(`/product`)
+export const getAllProduct = (payload) => {
+  const uri = `/product?page=${payload.page}&limit=${payload.limit}`
+  return api.get(uri)
+}
 export const deleteProductById = id => api.delete(`/product/${id}`)
 export const getProductById = id => api.get(`/product/${id}`)
 
