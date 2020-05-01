@@ -11,7 +11,8 @@ const mongoUri = `mongodb+srv://${userDb}:${passDb}@${hostDb}/${database}?retryW
 mongoose
   .connect(mongoUri, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
   })
   .catch(e => {
     console.error('Connection error', e.message)

@@ -12,7 +12,7 @@ const scrapeProduct = async (productURI) => {
   const $ = cheerio.load(html);
 
   /* Get product title */
-  const name = $('#productTitle').text().replace(/^\s+|\s+$/g, '')
+  const name = $('#productTitle').text().trim()
 
   // ASIN
   const splittedProductURI = productURI.split('/')
@@ -25,7 +25,7 @@ const scrapeProduct = async (productURI) => {
   const price = $('#priceblock_ourprice').text() || 0
 
   /* Get product description */
-  const description = $('#productDescription').text().replace(/^\s+|\s+$/g, '').replace(/ +(?= )/g,'')
+  const description = $('#productDescription').text().trim()
   
   const product = { 
     name,

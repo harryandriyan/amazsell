@@ -29,7 +29,7 @@ class ProductList extends Component {
     }
     await api.getAllProduct(params).then(product => {
       if (product.data.data.length > 0) {
-        const data = this.state.data.concat(product.data.data);
+        const data = page === 1 ? product.data.data : this.state.data.concat(product.data.data);
         this.setState({
           data,
           loading: false,
@@ -62,7 +62,7 @@ class ProductList extends Component {
     });
     await api.insertProduct(values).then(res => {
       this.openNotification('success', 'Product', 'Product inserted successfully')
-      this.getData()
+      this.getData(this.state.currentPage)
       this.setState({
         confirmLoading: false,
         modalVisible: false
@@ -73,10 +73,10 @@ class ProductList extends Component {
     })
   }
 
-  handleDelete = async (id) => {
-    await api.deleteProductById(id).then(res => {
+  handleDelete = async (asin) => {
+    await api.deleteProductById(asin).then(res => {
       this.openNotification('success', 'Product', 'Product deleted successfully')
-      this.getData(this.state.currentPage)
+      this.getData(1)
     })
     .catch(error => {
       this.openNotification('error', 'Product', error.message.name)
@@ -172,7 +172,7 @@ class ProductList extends Component {
                 <Link to={`/product/${item.asin}`} key="list-loadmore-show"><EyeOutlined /> See detail</Link>, 
                 <Popconfirm
                   title="Are you sure delete this product?"
-                  onConfirm={() => this.handleDelete(item._id)}
+                  onConfirm={() => this.handleDelete(item.asin)}
                   onCancel={this.cancelDelete}
                   okText="Yes"
                   cancelText="No"

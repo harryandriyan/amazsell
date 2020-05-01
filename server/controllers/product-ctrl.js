@@ -52,17 +52,15 @@ createProduct = (req, res) => {
 }
 
 deleteProduct = async (req, res) => {
-  await Product.findOneAndDelete({ asin: req.params.asin }, (err, product) => {
-    return product
-  }).catch(err => console.log(err))
+  await Product.findOneAndDelete({ asin: req.params.id }, async (err, product) => {
+    
+    await Review.deleteMany({ asin: req.params.id }, (err, review) => {
+      return res
+        .status(200)
+        .json({ success: false, error: `Product deleted` })
+    }).catch(err => console.log(err))
 
-  await Review.deleteMany({ asin: req.params.asin }, (err, review) => {
-    return review
   }).catch(err => console.log(err))
-
-  return res
-    .status(200)
-    .json({ success: false, error: `Product deleted` })
 }
 
 getProductById = async (req, res) => {
