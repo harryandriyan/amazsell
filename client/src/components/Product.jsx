@@ -61,7 +61,7 @@ class ProductList extends Component {
       confirmLoading: true,
     });
     await api.insertProduct(values).then(res => {
-      this.openNotification('success', 'Product', 'Product inserted successfully')
+      this.openNotification('success', 'Product', res.data.message)
       this.getData(this.state.currentPage)
       this.setState({
         confirmLoading: false,
@@ -69,7 +69,7 @@ class ProductList extends Component {
       })
     })
     .catch(error => {
-      this.openNotification('error', 'Product', error.message.name)
+      this.openNotification('error', 'Product', error.message.message)
     })
   }
 

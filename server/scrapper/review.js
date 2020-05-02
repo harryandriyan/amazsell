@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 const puppeteerConfig = { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080','--user-agent="Mozilla/5.0 (Macintosh Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36"'] }
 
-const scrapeReview = async (asin) => {
+const scrapeReview = async (asin, pageNumber) => {
   const browser = await puppeteer.launch(puppeteerConfig)
   const page = await browser.newPage()
-  const URI = `https://www.amazon.com/product-reviews/${asin}`
+  const URI = `https://www.amazon.com/product-reviews/${asin}?pageNumber=${pageNumber}`
 
   await page.goto(URI)
   await page.waitForSelector('body')
@@ -70,8 +70,8 @@ const scrapeReview = async (asin) => {
       score: score[index],
       date: date[index],
       author: author[index],
-      number_of_comment: number_of_comment[index],
-      number_of_vote: number_of_vote[index],
+      number_of_comment: number_of_comment[index] || 0,
+      number_of_vote: number_of_vote[index] || 0,
       is_has_media: is_has_media[index] || false,
       is_verified: is_verified[index] || false,
       is_child: false,
@@ -85,4 +85,23 @@ const scrapeReview = async (asin) => {
   return reviewData
 }
 
+const scrapeTotalPage = async (asin) => {
+  const browser = await puppeteer.launch(puppeteerConfig);
+  const browserPage = await browser.newPage();
+  const URI = `https://www.amazon.com/product-reviews/${asin}`;
+
+  await browserPage.goto(URI);
+  await browserPage.waitForSelector('body');
+
+  const html = await browserPage.evaluate(() => document.body.innerHTML);
+  const $ = cheerio.load(html);
+  const totalReview = Number($('#filter-info-section > span').text().split(' ')[3].replace(/,/g, ''));
+
+  const totalPage = Math.ceil(totalReview / 10); 
+
+  browser.close();
+  return totalPage;
+};
+
 module.exports.scrapeReview = scrapeReview
+module.exports.scrapeTotalPage = scrapeTotalPage

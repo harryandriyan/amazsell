@@ -1,48 +1,88 @@
 const Review = require('../models/review-model')
 const ReviewScrapper = require('../scrapper/review')
 
-createReview = (req, res) => {
+createReview = async (req, res) => {
   const { asin } = req.params
 
-  const reviewData = new Promise((resolve, reject) => {
-    ReviewScrapper
-      .scrapeReview(asin)
-      .then(data => {
-        resolve(data)
-      })
-      .catch(err => reject(err))
-  })
+  ReviewScrapper.scrapeTotalPage(asin).then(totalPage => {
 
-  Promise.all([reviewData])
-    .then(data => {
-      const reviewData = data[0];
+    for (let index = 1; index <= totalPage; index++) {
 
-      reviewData.map(data => {
-        const review = new Review(data)
+      new Promise((resolve, reject) => {
+        ReviewScrapper
+          .scrapeReview(asin, index)
+          .then(reviewData => {
 
-        if (!review) {
-          return res.status(400).json({ success: false, error: err })
-        }
+            reviewData.map(data => {
+              const review = new Review(data)
 
-        review
-          .save()
-          .then(() => {
-            return res.status(201).json({
-            success: true,
-            id: review._id,
-            message: 'Review created!',
+              if (!review) {
+                return res.status(400).json({ success: false, error: err })
+              }
+
+              review
+                .save()
+                .then(() => {
+                  return res.status(201).json({
+                  success: true,
+                  id: review._id,
+                  message: 'Review created!',
+                })
+              })
+              .catch(error => {
+                return res.status(400).json({
+                  error,
+                  message: 'Review not created!',
+                })
+              })
+            })
           })
-        })
-        .catch(error => {
-          return res.status(400).json({
-            error,
-            message: 'Review not created!',
-          })
-        })
+          .catch(err => reject(err))
       })
       
-    })
-    .catch(err => res.status(500).send(err))
+    }
+  });
+
+
+  // const reviewData = new Promise((resolve, reject) => {
+  //   ReviewScrapper
+  //     .scrapeReview(asin)
+  //     .then(data => {
+  //       resolve(data)
+  //     })
+  //     .catch(err => reject(err))
+  // })
+
+  // Promise.all([reviewData])
+  //   .then(data => {
+  //     const reviewData = data[0];
+
+  //     reviewData.map(data => {
+  //       const review = new Review(data)
+
+  //       if (!review) {
+  //         return res.status(400).json({ success: false, error: err })
+  //       }
+
+  //       review
+  //         .save()
+  //         .then(() => {
+  //           return res.status(201).json({
+  //           success: true,
+  //           id: review._id,
+  //           message: 'Review created!',
+  //         })
+  //       })
+  //       .catch(error => {
+  //         return res.status(400).json({
+  //           error,
+  //           message: 'Review not created!',
+  //         })
+  //       })
+  //     })
+      
+  //   })
+  //   .catch(err => res.status(500).send(err))
 }
 
 updateReview = async(req, res) => {

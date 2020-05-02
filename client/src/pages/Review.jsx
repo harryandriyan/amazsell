@@ -23,9 +23,9 @@ class Review extends Component {
     if(!this.timerId) {     
       this.timerId = setInterval(() => {
         if (this.state.percent < 100) {
-          this.setState({ percent: this.state.percent + 2 })
+          this.setState({ percent: this.state.percent + 1 })
         }
-      }, 500)
+      }, 1000)
     }
   }
   

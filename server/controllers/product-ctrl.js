@@ -2,7 +2,7 @@ const Product = require('../models/product-model')
 const Review = require('../models/review-model')
 const ProductScrapper = require('../scrapper/product')
 
-createProduct = (req, res) => {
+createProduct = async (req, res) => {
   const body = req.body
 
   if (!body) {
@@ -10,6 +10,14 @@ createProduct = (req, res) => {
       success: false,
       error: 'You must provide a product',
     })
+  }
+
+  const splittedProductURI = body.productLink.split('/')
+  const asin = splittedProductURI[5].substring(0,10)
+
+  const isProductExist = await Product.countDocuments({ asin });
+  if (isProductExist > 0) {
+    return res.status(400).json({ success: false, message: 'Product already exist!' })
   }
 
   const productInfo = new Promise((resolve, reject) => {
