@@ -32,7 +32,8 @@ const scrapeProduct = async (productURI) => {
     asin,
     description,
     price,
-    rating
+    rating,
+    link: productURI
   }
 
   await browser.close()

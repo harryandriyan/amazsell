@@ -10,14 +10,14 @@ export const getAllProduct = (payload) => {
   return api.get(uri)
 }
 export const deleteProductById = id => api.delete(`/product/${id}`)
-export const getProductById = id => api.get(`/product/${id}`)
+export const getProductByASIN = asin => api.get(`/product/${asin}`)
 
 export const generateReview = asin => api.post(`/review/${asin}`)
 export const updateReview = payload => api.put(`/review`, payload)
 export const deleteReviewById = id => api.delete(`/review/${id}`)
 export const getAllReview = () => api.get(`/review`)
 export const getReviewByASIN = (payload) => {
-  const uri = `/review-by-asin?asin=${payload.asin}&page=${payload.page}&limit=${payload.limit}`
+  const uri = `/review-by-asin?asin=${payload.asin}&page=${payload.page}&limit=${payload.limit}&score=${payload.score}&is_verified=${payload.is_verified}`
   return api.get(uri)
 }
 export const getReviewCountByASIN = asin => api.get(`/review-count-by-asin/${asin}`)
@@ -25,17 +25,18 @@ export const getReviewInsight = () => api.get(`/review-insight`)
 
 export const insertTags = payload => api.post(`/tag`, payload)
 export const deleteTagsById = id => api.delete(`/tag/${id}`)
-export const getAllTags = (payload) => {
+export const getTags = (payload) => {
   const uri = `/tags?page=${payload.page}&limit=${payload.limit}`
   return api.get(uri)
 }
+export const getAllTags = () => api.get(`/all-tags`)
 export const getTagsByASIN = asin => api.get(`/tags-by-asin/${asin}`)
 
 const apis = {
   insertProduct,
   getAllProduct,
   deleteProductById,
-  getProductById,
+  getProductByASIN,
 
   generateReview,
   updateReview,
@@ -47,6 +48,7 @@ const apis = {
   
   insertTags,
   deleteTagsById,
+  getTags,
   getAllTags,
   getTagsByASIN,
 }

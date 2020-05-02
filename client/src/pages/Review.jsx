@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Row, Col, Button, Progress } from 'antd'
+import { Row, Col, Button, Progress, Rate } from 'antd'
 import { 
   Review as ReviewComponent, 
   Summary as SummaryComponent 
@@ -13,10 +13,12 @@ class Review extends Component {
     loading: false,
     percent: 0,
     reviewStarted: false,
+    product: null,
   }
 
   componentDidMount() {
     this.getData()
+    this.getProduct()
   }
 
   startTimer = () => {
@@ -43,6 +45,16 @@ class Review extends Component {
     await api.getReviewCountByASIN(params.asin).then(reviews => {
       this.setState({
         isHasReview: reviews.data.count > 0,
+      })
+    })
+  }
+
+  getProduct = async() => {
+    const { match: { params } } = this.props
+
+    await api.getProductByASIN(params.asin).then(product => {
+      this.setState({
+        product: product.data.data,
       })
     })
   }
@@ -83,11 +95,28 @@ class Review extends Component {
   }
 
   render() {
-    const { isHasReview } = this.state
+    const { isHasReview, product } = this.state
     return (
       <Fragment>
+        <Row>
+          <Col span={24}>
+            <h2>Product Detail</h2>
+          </Col>
+          {product && (
+            <Col span={24}>
+              <a href={product.link} target="_blank">
+                <h3>{product.asin} - {product.name}</h3>
+              </a>
+              <p>{product.description}</p>
+              <strong style={{ color: 'blue', marginRight: '15px' }}>{product.price}</strong>
+              <Rate allowHalf defaultValue={product.rating} />
+              <span style={{ marginLeft: '15px' }}>{product.rating}</span>
+            </Col>
+          )}
+        </Row>
+        <hr />
         {isHasReview ? (
-          <Row>
+          <Row style={{marginTop: '20px'}}>
             <Col span={14}>
               <h1>Review </h1>
               <ReviewComponent {...this.props} />

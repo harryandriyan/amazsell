@@ -23,7 +23,7 @@ class TagsList extends Component {
       page,
       limit: this.state.limit
     }
-    await api.getAllTags(params).then(tags => {
+    await api.getTags(params).then(tags => {
       if (tags.data.data.length > 0) {
         const data = page === 1 ? tags.data.data : this.state.data.concat(tags.data.data);
         this.setState({

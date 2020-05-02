@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { List, Rate, Skeleton, Select, Button, notification } from 'antd'
+import { List, Rate, Switch, Skeleton, Select, Button, Row, Col, notification } from 'antd'
 import api from '../api'
 
 const { Option } = Select
@@ -10,7 +10,9 @@ class Review extends Component {
     loading: false,
     tagOption: [],
     currentPage: 1,
-    limit: 5
+    limit: 5,
+    is_verified: false,
+    score: 0,
   }
   
   componentDidMount() {
@@ -25,19 +27,26 @@ class Review extends Component {
     const params = {
       page,
       asin,
-      limit: this.state.limit
+      limit: this.state.limit,
+      is_verified: this.state.is_verified,
+      score: this.state.score,
     }
     await api.getReviewByASIN(params).then(reviews => {
-      if (reviews.data.data.length > 0) {
-        const data = this.state.data.concat(reviews.data.data);
-        this.setState({
-          data,
-          loading: false,
-          currentPage: reviews.data.page,
-          totalPages: reviews.data.totalPages
-        })
-        window.dispatchEvent(new Event('resize'))
+      let data = reviews.data.data
+      const dataLength = data.length
+      if (dataLength > 0) {
+        data = page > 1 ? this.state.data.concat(data) : data
+      } else {
+        data = page > 1 ? this.state.data : data
       }
+
+      this.setState({
+        data,
+        loading: false,
+        currentPage: reviews.data.page,
+        totalPages: reviews.data.totalPages
+      })
+      window.dispatchEvent(new Event('resize'))
     })
   }
 
@@ -47,7 +56,7 @@ class Review extends Component {
     if (nextPage <= totalPages) {
       this.getData(nextPage)
     }
-  };
+  }
 
   getTags = async() => {
     await api.getAllTags().then(tags => {
@@ -66,10 +75,25 @@ class Review extends Component {
       id: reviewId
     }
     await api.updateReview(payload).then(res => {
-      this.openNotification('success', 'Tags', 'Tags inserted successfully')
+      this.openNotification('success', 'Tags', 'Tags updated successfully')
     })
     .catch(error => {
       this.openNotification('error', 'Tags', error.message.name)
+    })
+  }
+
+  filterList = (value, key) => {
+    this.setState({ [key]: value }, () => {
+      this.getData(1)
+    })
+  }
+
+  clearFilter = () => {
+    this.setState({
+      is_verified: false,
+      score:0 
+    }, () => {
+      this.getData(1)
     })
   }
 
@@ -77,14 +101,14 @@ class Review extends Component {
     notification[type]({
       message,
       description
-    });
-  };
+    })
+  }
 
   render() {
-    const { data, loading, tagOption, currentPage, totalPages } = this.state
+    const { data, loading, tagOption, currentPage, totalPages, score, is_verified } = this.state
     const nextPage = currentPage + 1
     const loadMore =
-      (!loading && nextPage <= totalPages) ? (
+      (!loading && nextPage <= totalPages && data.length > 0) ? (
         <div
           style={{
             textAlign: 'center',
@@ -98,6 +122,19 @@ class Review extends Component {
       ) : null
     return (
       <Fragment>
+        <div>
+          <h4>Filter</h4>
+          <span>
+            Show verified <Switch checked={is_verified} onChange={(checked) => this.filterList(checked, 'is_verified')} />
+          </span>
+          <span style={{ marginLeft: '20px' }}>
+            Show by Stars <Rate value={score} onChange={(value) => this.filterList(value, 'score')} style={{ fontSize: '20px' }} />
+          </span>
+          <span style={{ float: 'right' }}>
+            <Button onClick={this.clearFilter}>Clear Filter</Button>
+          </span>
+          <hr />
+        </div>
         <List
           className="demo-loadmore-list"
           itemLayout="vertical"
@@ -110,7 +147,7 @@ class Review extends Component {
               key={item._id}
               extra={
                 <div>
-                  <Rate disabled defaultValue={item.score} />
+                  <Rate disabled value={item.score} />
                   <h4>{item.author}</h4>
                   <div style={{ display: 'block' }}>
                     <div>{item.date}</div>

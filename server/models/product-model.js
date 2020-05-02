@@ -8,6 +8,7 @@ const Product = new Schema(
     description: { type: String, required: true },
     price: { type: String, required: true },
     rating: { type: Number, required: true },
+    link: { type: String, required: true },
   },
   { timestamps: true },
 )

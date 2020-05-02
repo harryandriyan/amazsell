@@ -71,8 +71,8 @@ deleteProduct = async (req, res) => {
   }).catch(err => console.log(err))
 }
 
-getProductById = async (req, res) => {
-  await Product.findOne({ _id: req.params.id }, (err, product) => {
+getProductByASIN = async (req, res) => {
+  await Product.findOne({ asin: req.params.asin }, (err, product) => {
     if (err) {
       return res.status(400).json({ success: false, error: err })
     }
@@ -111,5 +111,5 @@ module.exports = {
   createProduct,
   deleteProduct,
   getProducts,
-  getProductById,
+  getProductByASIN,
 }
