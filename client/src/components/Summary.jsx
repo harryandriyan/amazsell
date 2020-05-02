@@ -28,10 +28,18 @@ class Review extends Component {
   }
 
   render() {
-    const { data, loading, tagOption } = this.state
     return (
       <Fragment>
         <table border="0" cellPadding={5} cellSpacing={5}>
+          <thead>
+            <tr>
+              <th width="15%">All <StarFilled style={{ color: '#fadb33', fontSize: '16px' }} /></th>
+              <th width="35%"><Progress style={{ height: '30px' }} percent={100} showInfo={false} /></th>
+              <th width="10%">85</th>
+              <th width="10%">33</th>
+              <th width="10%">53</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
               <td><strong>5</strong> <StarFilled style={{ color: '#fadb33', fontSize: '16px' }} /></td>

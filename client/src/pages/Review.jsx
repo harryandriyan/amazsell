@@ -109,7 +109,7 @@ class Review extends Component {
               </a>
               <p>{product.description}</p>
               <strong style={{ color: 'blue', marginRight: '15px' }}>{product.price}</strong>
-              <Rate allowHalf defaultValue={product.rating} />
+              <Rate disabled allowHalf defaultValue={product.rating} />
               <span style={{ marginLeft: '15px' }}>{product.rating}</span>
             </Col>
           )}

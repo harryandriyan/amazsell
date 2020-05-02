@@ -16,25 +16,24 @@ createReview = async (req, res) => {
             reviewData.map(data => {
               const review = new Review(data)
 
-              if (!review) {
-                return res.status(400).json({ success: false, error: err })
+              if (review) {
+                review
+                  .save()
+                  .then(() => {
+                    return res.status(201).json({
+                    success: true,
+                    id: review._id,
+                    message: 'Review created!',
+                  })
+                })
+                .catch(error => {
+                  return res.status(400).json({
+                    error,
+                    message: 'Review not created!',
+                  })
+                })
               }
 
-              review
-                .save()
-                .then(() => {
-                  return res.status(201).json({
-                  success: true,
-                  id: review._id,
-                  message: 'Review created!',
-                })
-              })
-              .catch(error => {
-                return res.status(400).json({
-                  error,
-                  message: 'Review not created!',
-                })
-              })
             })
           })
           .catch(err => reject(err))
@@ -43,46 +42,6 @@ createReview = async (req, res) => {
     }
   });
 
-
-  // const reviewData = new Promise((resolve, reject) => {
-  //   ReviewScrapper
-  //     .scrapeReview(asin)
-  //     .then(data => {
-  //       resolve(data)
-  //     })
-  //     .catch(err => reject(err))
-  // })
-
-  // Promise.all([reviewData])
-  //   .then(data => {
-  //     const reviewData = data[0];
-
-  //     reviewData.map(data => {
-  //       const review = new Review(data)
-
-  //       if (!review) {
-  //         return res.status(400).json({ success: false, error: err })
-  //       }
-
-  //       review
-  //         .save()
-  //         .then(() => {
-  //           return res.status(201).json({
-  //           success: true,
-  //           id: review._id,
-  //           message: 'Review created!',
-  //         })
-  //       })
-  //       .catch(error => {
-  //         return res.status(400).json({
-  //           error,
-  //           message: 'Review not created!',
-  //         })
-  //       })
-  //     })
-      
-  //   })
-  //   .catch(err => res.status(500).send(err))
 }
 
 updateReview = async(req, res) => {
