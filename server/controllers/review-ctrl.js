@@ -167,6 +167,29 @@ getReviews = async (req, res) => {
   }).catch(err => console.log(err))
 }
 
+getInsight = async (req, res) => {
+  await Review.find({}, (err, reviews) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err })
+    }
+
+    const one = reviews.filter(review => review.score === 1).length
+    const two = reviews.filter(review => review.score === 2).length
+    const three = reviews.filter(review => review.score === 3).length
+    const four = reviews.filter(review => review.score === 4).length
+    const five = reviews.filter(review => review.score === 5).length
+    const insight = [
+      { name: '🌟', total: one },
+      { name: '🌟🌟', total: two },
+      { name: '🌟🌟🌟', total: three },
+      { name: '🌟🌟🌟🌟', total: four },
+      { name: '🌟🌟🌟🌟🌟', total: five }
+    ]
+    
+    return res.status(200).json({ success: true, data: insight })
+  }).catch(err => console.log(err))
+}
+
 module.exports = {
   createReview,
   updateReview,
@@ -174,4 +197,5 @@ module.exports = {
   getReviewByASIN,
   getReviewCountByASIN,
   getReviews,
+  getInsight
 }

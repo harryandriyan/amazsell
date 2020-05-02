@@ -2,18 +2,32 @@ import React, { Component, Fragment } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+import api from '../api'
 
 
 class Insight extends Component {
   state = {
     data: [
-      { name: '🌟', total: 1 },
-      { name: '🌟🌟', total: 3 },
-      { name: '🌟🌟🌟', total: 5 },
-      { name: '🌟🌟🌟🌟', total: 25 },
-      { name: '🌟🌟🌟🌟🌟', total: 73 },
+      { name: '🌟', total: 0 },
+      { name: '🌟🌟', total: 0 },
+      { name: '🌟🌟🌟', total: 0 },
+      { name: '🌟🌟🌟🌟', total: 0 },
+      { name: '🌟🌟🌟🌟🌟', total: 0 },
     ]
   }
+
+  componentDidMount() {
+    this.getData()
+  }
+
+  getData = async() => {
+    await api.getReviewInsight().then(reviews => {
+      this.setState({
+        data: reviews.data.data,
+      })
+    })
+  }
+
   render() {
     const { data } = this.state
     return (

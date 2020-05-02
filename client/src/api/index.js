@@ -21,6 +21,7 @@ export const getReviewByASIN = (payload) => {
   return api.get(uri)
 }
 export const getReviewCountByASIN = asin => api.get(`/review-count-by-asin/${asin}`)
+export const getReviewInsight = () => api.get(`/review-insight`)
 
 export const insertTag = payload => api.post(`/tag`, payload)
 export const deleteTagsById = id => api.delete(`/tag/${id}`)
@@ -39,6 +40,7 @@ const apis = {
   getAllReview,
   getReviewByASIN,
   getReviewCountByASIN,
+  getReviewInsight,
   
   insertTag,
   deleteTagsById,
