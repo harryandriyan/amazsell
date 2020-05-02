@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Layout, Menu } from 'antd'
 import {
-  HomeOutlined,
-  SmileOutlined,
+  HomeFilled,
+  SmileFilled,
+  SettingFilled
 } from '@ant-design/icons';
-import { Dashboard, About, Review } from '../pages'
+import { Dashboard, About, Review, Settings } from '../pages'
 import 'antd/dist/antd.css'
 
 const { Header, Footer, Content } = Layout
@@ -21,13 +22,19 @@ function App() {
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
             <Menu.Item key="1">
               <Link to="/" className="nav-link">
-                <HomeOutlined />
+                <HomeFilled />
                 Dashboard
               </Link>
             </Menu.Item>
             <Menu.Item key="2">
+              <Link to="/settings" className="nav-link">
+                <SettingFilled />
+                Settings
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="3">
               <Link to="/about" className="nav-link">
-                <SmileOutlined />
+                <SmileFilled />
                 About
               </Link>
             </Menu.Item>
@@ -38,6 +45,7 @@ function App() {
             <Switch>
               <Route path="/" exact component={Dashboard} />
               <Route path="/about" exact component={About} />
+              <Route path="/settings" exact component={Settings} />
               <Route path="/product/:asin" exact component={Review} />
             </Switch>
           </div>

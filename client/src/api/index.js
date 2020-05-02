@@ -23,9 +23,12 @@ export const getReviewByASIN = (payload) => {
 export const getReviewCountByASIN = asin => api.get(`/review-count-by-asin/${asin}`)
 export const getReviewInsight = () => api.get(`/review-insight`)
 
-export const insertTag = payload => api.post(`/tag`, payload)
+export const insertTags = payload => api.post(`/tag`, payload)
 export const deleteTagsById = id => api.delete(`/tag/${id}`)
-export const getAllTags = () => api.get(`/tags`)
+export const getAllTags = (payload) => {
+  const uri = `/tags?page=${payload.page}&limit=${payload.limit}`
+  return api.get(uri)
+}
 export const getTagsByASIN = asin => api.get(`/tags-by-asin/${asin}`)
 
 const apis = {
@@ -42,7 +45,7 @@ const apis = {
   getReviewCountByASIN,
   getReviewInsight,
   
-  insertTag,
+  insertTags,
   deleteTagsById,
   getAllTags,
   getTagsByASIN,

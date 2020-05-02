@@ -1,13 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import { Link } from 'react-router-dom'
-import { List, Avatar, Skeleton, Button, Modal, Form, Input, Popconfirm, notification } from 'antd'
-import {
-  DeleteFilled,
-  EyeFilled,
-} from '@ant-design/icons'
+import { List, Skeleton, Button, Modal, Form, Input, Popconfirm, notification } from 'antd'
+import { DeleteFilled } from '@ant-design/icons'
 import api from '../api'
 
-class ProductList extends Component {
+class TagsList extends Component {
   state = {
     loading: false,
     data: [],
@@ -27,14 +23,14 @@ class ProductList extends Component {
       page,
       limit: this.state.limit
     }
-    await api.getAllProduct(params).then(product => {
-      if (product.data.data.length > 0) {
-        const data = page === 1 ? product.data.data : this.state.data.concat(product.data.data);
+    await api.getAllTags(params).then(tags => {
+      if (tags.data.data.length > 0) {
+        const data = page === 1 ? tags.data.data : this.state.data.concat(tags.data.data);
         this.setState({
           data,
           loading: false,
-          currentPage: product.data.page,
-          totalPages: product.data.totalPages
+          currentPage: tags.data.page,
+          totalPages: tags.data.totalPages
         })
         window.dispatchEvent(new Event('resize'))
       }
@@ -60,8 +56,8 @@ class ProductList extends Component {
     this.setState({
       confirmLoading: true,
     });
-    await api.insertProduct(values).then(res => {
-      this.openNotification('success', 'Product', res.data.message)
+    await api.insertTags(values).then(res => {
+      this.openNotification('success', 'Tags', res.data.message)
       this.getData(this.state.currentPage)
       this.setState({
         confirmLoading: false,
@@ -69,22 +65,22 @@ class ProductList extends Component {
       })
     })
     .catch(error => {
-      this.openNotification('error', 'Product', error.message.message)
+      this.openNotification('error', 'Tags', error.message.message)
     })
   }
 
-  handleDelete = async (asin) => {
-    await api.deleteProductById(asin).then(res => {
-      this.openNotification('success', 'Product', 'Product deleted successfully')
+  handleDelete = async (id) => {
+    await api.deleteTagsById(id).then(res => {
+      this.openNotification('success', 'Tags', 'Tags deleted successfully')
       this.getData(1)
     })
     .catch(error => {
-      this.openNotification('error', 'Product', error.message.name)
+      this.openNotification('error', 'Tags', error.message.name)
     })
   }
   
   cancelDelete = () => {
-    this.openNotification('info', 'Product', 'Delete Product canceled')
+    this.openNotification('info', 'Tags', 'Delete Tags canceled')
   }
 
   openNotification = (type, message, description) => {
@@ -116,46 +112,46 @@ class ProductList extends Component {
             lineHeight: '32px',
           }}
         >
-          <Button onClick={this.onLoadMore}>load more products</Button>
+          <Button onClick={this.onLoadMore}>load more tags</Button>
         </div>
       ) : null
 
     return (
       <Fragment>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h2>Product List</h2>
+          <h2>Manage Tags</h2>
           <Button type="primary pull-right" onClick={this.toggleModal}>
-            Add Product
+            Add Tags
           </Button>
           <Modal
-            title="Add Product"
+            title="Add Tags"
             visible={modalVisible}
             confirmLoading={confirmLoading}
             footer={[
               <Button key="back" onClick={this.toggleModal}>
                 Cancel
               </Button>,
-              <Button form="productForm" key="submit" type="primary" htmlType="submit" loading={confirmLoading}>
-                Save Product
+              <Button form="tagsForm" key="submit" type="primary" htmlType="submit" loading={confirmLoading}>
+                Save Tags
               </Button>,
             ]}
           >
             <Form
               name="basic"
-              id="productForm"
+              id="tagsForm"
               onFinish={this.handleAdd}
             >
               <Form.Item
-                label="Link"
-                name="productLink"
+                label="Tag"
+                name="name"
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the product link!',
+                    message: 'Please input the tags link!',
                   },
                 ]}
               >
-                <Input placeholder="https://amazon.com/....." />
+                <Input placeholder="To small" />
               </Form.Item>
             </Form>
           </Modal>
@@ -169,10 +165,9 @@ class ProductList extends Component {
           renderItem={item => (
             <List.Item
               actions={[
-                <Link to={`/product/${item.asin}`} key="list-loadmore-show"><EyeFilled /> See detail</Link>, 
                 <Popconfirm
-                  title="Are you sure delete this product?"
-                  onConfirm={() => this.handleDelete(item.asin)}
+                  title="Are you sure delete this tags?"
+                  onConfirm={() => this.handleDelete(item._id)}
                   onCancel={this.cancelDelete}
                   okText="Yes"
                   cancelText="No"
@@ -183,13 +178,7 @@ class ProductList extends Component {
             >
               <Skeleton avatar title={false} loading={item.loading} active>
                 <List.Item.Meta
-                  avatar={
-                    <Link to={`/product/${item.asin}`}>
-                      <Avatar src="https://images-na.ssl-images-amazon.com/images/G/01/rainier/available_at_amazon_1200x600_Nvz5h2M.png" />
-                    </Link>
-                  }
-                  title={<Link to={`/product/${item.asin}`}>{item.asin}</Link>}
-                  description={`${item.name} \n ${item.price} \n Rating: ${item.rating}`}
+                  title={item.name}
                 />
               </Skeleton>
             </List.Item>
@@ -200,4 +189,4 @@ class ProductList extends Component {
   }
 }
 
-export default ProductList;
+export default TagsList;

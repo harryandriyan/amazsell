@@ -39,12 +39,6 @@ deleteTag = async (req, res) => {
       return res.status(400).json({ success: false, error: err })
     }
 
-    if (!tag) {
-      return res
-        .status(404)
-        .json({ success: false, error: `Tag not found` })
-    }
-
     return res.status(200).json({ success: true, data: tag })
   }).catch(err => console.log(err))
 }
@@ -60,17 +54,28 @@ getTagsByASIN = async (req, res) => {
 }
 
 getTags = async (req, res) => {
-  await Tag.find({}, (err, tags) => {
-    if (err) {
-      return res.status(400).json({ success: false, error: err })
+  const page  = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+
+  try {
+
+    const data = await Tag.find({ })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+      // get total documents in the Posts collection 
+      const count = await Tag.countDocuments()
+
+      // return response with posts, total pages, and current page
+      res.status(200).json({
+        data,
+        totalPages: Math.ceil(count / limit),
+        page
+      })
+    } catch (err) {
+      console.error(err.message)
     }
-    if (!tags.length) {
-      return res
-        .status(404)
-        .json({ success: false, error: `Tag not found` })
-    }
-    return res.status(200).json({ success: true, data: tags })
-  }).catch(err => console.log(err))
 }
 
 module.exports = {
