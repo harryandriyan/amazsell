@@ -24,4 +24,5 @@ app.use('/api', productRouter)
 app.use('/api', reviewRouter)
 app.use('/api', tagRouter)
 
-app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`))
+const server = app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`))
+server.timeout = 360000
