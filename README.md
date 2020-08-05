@@ -1,5 +1,5 @@
 # amazsell
-Amazon Review Sucker & Classifier Tool
+Amazon Review Sucker & Classifier Tool!!
 
 ## What you should install?
 
